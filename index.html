@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AI Business Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0c0c0c;--card:#161616;--line:#2a2a2a;--tx:#ecebe6;--mu:#8d8d86;--ac:#c6f432;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.55 'Schibsted Grotesk',system-ui,sans-serif}
+#app{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+aside{border-right:1px solid var(--line);padding:24px 18px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:6px}
+aside b{font-size:13px;letter-spacing:.04em;margin-bottom:14px}
+.nav{all:unset;cursor:pointer;display:flex;gap:10px;padding:10px 12px;border-radius:8px;color:var(--mu)}
+.nav.on{background:var(--card);color:var(--tx);box-shadow:inset 2px 0 var(--ac)}.nav i{margin-left:auto;color:var(--ac);font-style:normal}
+.nav:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.prog{margin-top:auto;font-size:13px;color:var(--mu)}.bar{height:4px;background:var(--line);border-radius:4px;margin-top:8px;overflow:hidden}.bar div{height:100%;background:var(--ac);transition:width .5s}
+.side-tools{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}.side-tools button{font-size:12px;padding:6px 10px}
+main{padding:48px clamp(18px,5vw,64px);max-width:920px;width:100%}
+h1{font-size:clamp(30px,5vw,50px);line-height:1.05;margin:0 0 10px;letter-spacing:-.02em;font-weight:800}
+.sub{color:var(--mu);margin:0 0 32px;max-width:60ch}
+.q{margin-bottom:24px}.q label{display:block;font-weight:700}.q small{display:block;color:var(--mu);margin:2px 0 8px}
+textarea,input[type=text]{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--tx);padding:12px 14px;font:inherit;resize:vertical}
+textarea{min-height:76px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{all:unset;cursor:pointer;border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:14px;background:var(--card)}
+.chip.on{background:var(--ac);color:#0c0c0c;border-color:var(--ac);font-weight:700}
+button.p,button.g{font:inherit;cursor:pointer;border-radius:10px;padding:12px 22px;border:1px solid var(--line);background:var(--card);color:var(--tx);transition:transform .15s}
+button.p{background:var(--ac);color:#0c0c0c;font-weight:800;border-color:var(--ac);font-size:16px}
+button:active{transform:scale(.97)}button:disabled{opacity:.45;cursor:not-allowed}
+.help{all:unset;cursor:pointer;color:var(--ac);font-size:13px;margin-top:6px;display:inline-block}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin:24px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}.card.w{grid-column:1/-1}
+.card h4{margin:0 0 6px;color:var(--mu);font-size:13px;font-weight:500}.card p,.card li{margin:0}.card ul{margin:0;padding-left:18px}
+.score{font-size:64px;font-weight:800;color:var(--ac);line-height:1}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.err{border:1px solid #6b2a2a;background:#1d1111;border-radius:10px;padding:14px;margin:16px 0}
+.ok{color:var(--ac);font-weight:700;margin-top:16px}
+.orb{width:120px;height:120px;border-radius:50%;margin:60px auto 28px;background:radial-gradient(circle at 35% 30%,#e8ff8a,var(--ac) 40%,#3a4a05);animation:pu 2s ease-in-out infinite}
+@keyframes pu{50%{transform:scale(1.14);filter:brightness(1.2)}}
+.load{text-align:center}.load .bar{max-width:380px;margin:16px auto}
+pre,.mp{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;max-height:420px;overflow:auto;white-space:pre-wrap;font:13px/1.5 ui-monospace,Menlo,monospace}
+.ws{display:grid;grid-template-columns:300px 1fr;gap:16px}
+.log{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;align-self:start}
+iframe{width:100%;height:70vh;border:1px solid var(--line);border-radius:12px;background:#fff;margin:0 auto;display:block;transition:width .3s}
+@media(max-width:800px){#app{grid-template-columns:1fr}aside{position:static;height:auto;flex-direction:row;flex-wrap:wrap;border:0;border-bottom:1px solid var(--line);padding:12px}aside b,.prog,.side-tools{width:100%;margin:0}.nav{padding:6px 10px;font-size:13px}.ws{grid-template-columns:1fr}main{padding-top:24px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<div id="app"><aside id="side"></aside><main id="main"></main></div>
+<script>
+const RULES="Rules: never fabricate testimonials, results, customer numbers, ratings, logos, scarcity, fake timers or guarantees (mark missing proof as [ADD REAL TESTIMONIAL] / [ADD VERIFIED RESULT]). Never invent payment links; use [INSERT PAYMENT LINK]. Specific over generic, outcomes over features, customer language over jargon, one dominant CTA. Infer reasonable missing details instead of asking. Use ₹ for India. Be concrete and commercially realistic.";
+const AI="Let AI decide";
+const ST=[
+{id:'business',n:'Business',h:"Let's find the business worth building.",p:"We turn your skills and advantages into one commercially viable opportunity.",btn:'Find my business',lock:'Lock this business & continue',
+qs:[['skills','What skills, knowledge or experience do you already have?','Include your job, strengths and what people ask you for.','t','e.g. 8 years in HR, good at hiring, people ask me to fix their interview process'],
+['interests','Which industries or topics interest you?','','t'],
+['type','What type of business do you prefer?','','c',['Service','Consulting','Coaching','Digital product','AI software','Agency','E-commerce',AI]],
+['assets','Do you have an audience, customers, network or other resources?','','t','e.g. 3k LinkedIn followers, a small WhatsApp community'],
+['invest','How much can you invest to launch?','','c',['Under ₹10k','₹10k–50k','₹50k–2L','₹2L+']],
+['speed','How fast do you want revenue?','','c',['Within 30 days','Within 90 days','Long-term build']],
+['avoid','Anything you refuse to build?','','t']],
+P:"Act as an elite business strategist and AI entrepreneur. Internally evaluate 3 opportunities on demand, problem severity, willingness to pay, ease of launch, margin, AI leverage, customer acquisition, scalability, founder fit and speed to revenue. Choose the single strongest. Return ONLY its blueprint as JSON with keys: businessIdea, whatWeSell, businessModel, niche, targetMarket, problemWeSolve, solution, primaryCustomerOutcome, whyCustomersPay, aiAdvantage, revenueModel, startingPrice, existingAdvantages, biggestOpportunity, score (number /100), positioning (\"We help [customer] achieve [outcome] using [solution].\")."},
+{id:'customer',n:'Customer',h:"Now let's find who will actually pay.",p:"One sharply defined customer beats everyone who might possibly buy.",btn:'Find my customer',lock:'Lock customer & continue',
+qs:[['geo','Which geography?','','c',['India','Global','Specific country',AI]],
+['ctype','Who do you sell to?','','c',['B2B','B2C','Either']],
+['spend','Customer spending power?','','c',['Mass market','Mid-market','Premium',AI]],
+['access','Any specific audience you can already reach?','Optional.','t']],
+P:"Identify 3 customer segments scored on problem severity, urgency, ability and willingness to pay, ease of finding and reaching online, market size and fit. Choose the one easiest and most profitable to acquire first. Distinguish what they say they want from what emotionally drives the purchase. Return ONLY JSON with keys: idealCustomer, description, geography, customerType, currentSituation, painfulProblem, secondaryProblems (array of 5), alreadyTried, whyExistingSolutionsFail, costOfNotSolving, dreamOutcome, topDesires (array of 5), buyingTrigger, topObjections (array of 5), whyTheyBuyFromUs, whereToFindThem, attentionGrabbingMessaging, transformation (FROM → TO), oneLineICP."},
+{id:'offer',n:'Offer',h:"Turn the idea into something people want to buy.",p:"We optimise outcome × belief, and minimise delay × effort × risk.",btn:'Build my offer',lock:'Lock offer & continue',
+qs:[['achieve','What can you realistically help the customer achieve?','','t'],
+['time','How quickly can you deliver the result?','','c',['Days','2–4 weeks','1–3 months',AI]],
+['delivery','Delivery model?','','c',['Done for you','Done with you','DIY','Software','Product','Hybrid',AI]],
+['price','Ideal price?','Or leave blank and AI will decide.','n'],
+['inc','What assets can you include?','Templates, calls, community, audits…','t'],
+['refuse','Anything you refuse to promise?','','t']],
+P:"Act as an elite offer strategist. Generate 3 offer concepts internally, score them on desire, severity, clarity, differentiation, value, ease of delivery, margin, speed, scalability and likelihood of purchase, and choose the winner. Keep the value stack believable with at most 3 bonuses that each remove an objection. Return ONLY JSON with keys: offerName, oneLineOffer, idealCustomer, coreProblem, corePromise, transformation, coreProduct, deliveryModel, keyDeliverables (array), expectedTimeline, standardPrice, launchPrice, bonuses (array of up to 3), riskReversal, genuineReasonToAct, differentiator, topReasonsToBuy (array of 3), primaryCTA, salesPitch, positioningStatement."},
+{id:'website',n:'Website',h:"Let's turn the business into a brand.",p:"Name, look, page structure and complete copy, all chosen for your customer.",btn:'Create brand & strategy',lock:'Lock website strategy & continue',
+qs:[['name','Business name','Type yours or leave blank for AI to create one.','n'],
+['wtype','Website type','','c',['Landing page','Business website','SaaS website','Lead generation','Webinar',AI]],
+['goal','Primary goal','','c',['Buy now','Book a call','Generate leads','Free trial','Join waitlist',AI]],
+['vibe','Brand personality','Pick any.','m',['Premium','Minimal','Bold','Luxury','Modern','Futuristic','Playful','Trustworthy','Energetic','Professional']],
+['colors','Preferred colours','Blank = AI chooses from customer psychology.','n'],
+['avoid','Anything to avoid?','Optional.','n']],
+P:"Act as brand strategist, direct-response copywriter and web strategist. Choose a short memorable non-generic brand name if none given. Choose the highest-converting page architecture (only sections that improve conversion; visitor must grasp what/for whom/result/why believe/what next within 5 seconds; ONE primary CTA). Write the actual copy, no placeholders. Return ONLY JSON with keys: brandName, tagline, positioning, personality, primaryColour, secondaryColour, accentColour, backgroundColours, typography, buttonAndCardStyle, designLanguage, pageType, primaryGoal, sectionOrder (array), heroHeadline, heroSubheadline, primaryCTA, problemCopy, solutionCopy, howItWorks (array of 3), benefits (array), offerSectionCopy, whyUs, trustSectionPlan, faqs (array of 6 'Q: … A: …'), finalCTA."},
+{id:'cro',n:'CRO',h:"Now let's make it convert.",p:"Great design gets attention. Conversion architecture turns it into action.",btn:'Run CRO audit & apply fixes',lock:'Apply CRO & create final build',qs:[],
+P:"Act as Chief Conversion Officer. Audit the proposed website against: message match, 5-second clarity, hero, single CTA architecture, offer clarity, trust (real proof only), objection mapping, friction, forms, mobile, price presentation, genuine urgency only, conversion flow. Reduce confusion, increase relevance, value and trust, reduce risk and friction. Then APPLY your strongest fixes. Return ONLY JSON with keys: conversionReadiness (number /100), subscores (array of 'Name: score'), flowRecommended, ctaStrategy, fixesApplied (array), objectionMap (array 'Objection → where answered'), mobileRules (array), formDesign, priceTreatment, honestUrgency, missingRealAssets (array)."}];
+let S=(()=>{try{return JSON.parse(localStorage.getItem('abb'))}catch(e){return null}})()||{step:0,a:{},bp:{},lock:{},master:'',site:''};
+let busy=false,editing=false,err='',sample=null,dl=null,msg='',pct=0,dev='100%';
+const $=s=>document.querySelector(s),esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const save=()=>{try{localStorage.setItem('abb',JSON.stringify(S))}catch(e){}};
+const lab=k=>{k=k.replace(/([A-Z])/g,' $1').toLowerCase();return k[0].toUpperCase()+k.slice(1)};
+const ctx=i=>JSON.stringify(ST.slice(0,i).map(s=>[s.id,S.bp[s.id]]));
+function pj(t){t=t.replace(/^```(?:json)?\s*/i,'').replace(/```\s*$/,'');return JSON.parse(t.slice(t.indexOf('{'),t.lastIndexOf('}')+1))}
+async function ai(p,o){o=o||{};const r=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:p,tier:o.modelTier||'default',json:!!o.json})});let d={};try{d=await r.json()}catch(e){}if(!r.ok)throw new Error(d.error||'Request failed ('+r.status+')');return o.json?pj(d.text):d.text}
+function val(v){if(Array.isArray(v))return'<ul>'+v.map(x=>'<li>'+esc(typeof x=='object'?JSON.stringify(x):x)+'</li>').join('')+'</ul>';return'<p>'+esc(typeof v=='object'?JSON.stringify(v):v)+'</p>'}
+function cards(bp){let h='<div class="cards">';for(const[k,v]of Object.entries(bp)){if(/score|conversionReadiness/.test(k)&&!isNaN(v))h+=`<div class="card"><h4>${lab(k)}</h4><div class="score">${esc(v)}</div></div>`;else h+=`<div class="card ${String(v).length>140||Array.isArray(v)?'w':''}"><h4>${lab(k)}</h4>${val(v)}</div>`}return h+'</div>'}
+function side(){const done=Object.keys(S.lock).length+(S.master?1:0),pc=Math.round(done/6*100);
+$('#side').innerHTML='<b>AI BUSINESS BUILDER</b>'+[...ST,{n:'Final build'}].map((s,i)=>`<button class="nav ${S.step==i?'on':''}" data-go="${i}">${i+1} ${s.n}<i>${(i<5?S.lock[s.id]:S.master)?'✓':''}</i></button>`).join('')+`<div class="prog">Business build progress ${pc}%<div class="bar"><div style="width:${pc}%"></div></div><div class="side-tools"><button class="g" data-act="reset">Start over</button></div></div>`}
+function qhtml(q){const[k,l,h,t,o,ex]=[q[0],q[1],q[2],q[3],q[4],q[4]];let v=S.a[k]||(t=='m'?[]:'');let f='';
+if(t=='c'||t=='m')f='<div class="chips">'+q[4].map(x=>`<button class="chip ${(t=='m'?v.includes(x):v==x)?'on':''}" data-k="${k}" data-t="${t}" data-v="${esc(x)}">${esc(x)}</button>`).join('')+'</div>';
+else if(t=='n')f=`<input type="text" data-in="${k}" value="${esc(v)}">`;
+else f=`<textarea data-in="${k}" placeholder="${esc(q[4]||'')}">${esc(v)}</textarea><button class="help" data-help="${k}">✦ Help me answer</button>`;
+return`<div class="q"><label>${l}</label>${h?`<small>${h}</small>`:''}${f}</div>`}
+function stage(i){const s=ST[i],bp=S.bp[s.id];
+if(busy)return`<div class="load"><div class="orb"></div><h1>${msg}</h1><div class="bar"><div style="width:${pct}%"></div></div></div>`;
+let h=`<h1>${s.h}</h1><p class="sub">${s.p}</p>`+(err?`<div class="err">We couldn't complete this step. Your answers are safe. ${esc(err)}</div>`:'');
+if(bp&&!editing){h+=cards(bp)+(S.lock[s.id]?`<div class="ok">${s.n} locked ✓</div>`:'')+`<div class="row"><button class="p" data-lock="${i}">${s.lock}</button><button class="g" data-edit="1">Edit answers</button><button class="g" data-gen="${i}">Regenerate</button></div>`}
+else h+=s.qs.map(qhtml).join('')+`<div class="row"><button class="p" data-gen="${i}">${s.btn}</button></div>`;
+return h}
+function final(){if(busy)return stage(S.step);
+let h=`<h1>${S.master?'Your business is ready to build.':'Create your build prompt.'}</h1><p class="sub">${S.master?'Paste it into Emergent, Lovable, Bolt, Replit, or let Claude build the site here.':'Everything from all five stages becomes one website-building instruction.'}</p>`+(err?`<div class="err">We couldn't complete this step. Your answers are safe. ${esc(err)}</div>`:'');
+if(!S.master)return h+`<div class="row"><button class="p" data-master="1">Generate master prompt</button></div>`;
+const w=S.bp.website||{};
+return h+`<div class="cards"><div class="card"><h4>Business name</h4><p>${esc(w.brandName||'')}</p></div><div class="card"><h4>Primary CTA</h4><p>${esc(w.primaryCTA||'')}</p></div><div class="card"><h4>Conversion readiness</h4><div class="score">${esc((S.bp.cro||{}).conversionReadiness||'–')}</div></div></div><div class="mp">${esc(S.master)}</div><div class="row"><button class="p" data-copy="master">Copy master prompt</button><button class="p" data-site="1">Build website with Claude</button><button class="g" data-dl="master">Download prompt (.txt)</button><button class="g" data-master="1">Regenerate</button></div>`}
+function work(){if(busy)return stage(S.step);
+return`<h1>Your website</h1>`+(err?`<div class="err">${esc(err)}</div>`:'')+`<div class="row"><button class="g" data-dev="100%">Desktop</button><button class="g" data-dev="768px">Tablet</button><button class="g" data-dev="390px">Mobile</button><button class="g" data-copy="site">Copy code</button><button class="g" data-dl="site">Download HTML</button><button class="g" data-code="1">View code</button><button class="g" data-site="1">Regenerate</button></div><div class="ws"><div class="log"><b>Edit with AI</b><textarea id="ed" placeholder="e.g. Make the hero more premium, add a pricing section"></textarea><button class="p" data-edit-ai="1">Apply edit</button></div><div><iframe id="fr" sandbox="allow-scripts" title="Website preview" style="width:${dev}"></iframe><pre id="code" hidden></pre></div></div>`}
+function render(){side();$('#main').innerHTML=S.step<5?stage(S.step):S.step==5?final():work();
+if(S.step==6&&!busy){const f=$('#fr');if(f)f.srcdoc=S.site}}
+const tick=(m,i)=>{msg=m[i%m.length];pct=Math.min(94,pct+6);if(busy)$('#main').innerHTML=stage(S.step==6?5:S.step)};
+async function run(m,fn){busy=true;err='';pct=4;let i=0;const sh=()=>{if(S.step>4)$('#main').innerHTML=`<div class="load"><div class="orb"></div><h1>${msg}</h1><div class="bar"><div style="width:${pct}%"></div></div></div>`;else $('#main').innerHTML=stage(S.step)};msg=m[0];sh();const t=setInterval(()=>{msg=m[++i%m.length];pct=Math.min(94,pct+5);sh()},2600);
+try{await fn()}catch(e){err=(e&&e.message)||'Please try again.'}clearInterval(t);busy=false;save();render()}
+const clean=t=>t.replace(/^```(?:html)?\s*/i,'').replace(/```\s*$/,'').trim();
+async function gen(i){const s=ST[i];await run(['Analyzing your answers…','Scoring options…','Choosing the strongest…','Building your blueprint…'],async()=>{S.bp[s.id]=await ai(`${s.P}\n${RULES}\nFounder answers: ${JSON.stringify(s.qs.length?S.a:{})}\nPrevious locked stages: ${ctx(i)}`,{json:1});editing=false;delete S.lock[s.id]})}
+async function master(){await run(['Combining all five stages…','Writing complete copy…','Adding CRO requirements…','Finalizing your master prompt…'],async()=>{S.master=clean(await ai(`Combine everything below into ONE website-building instruction that commands the generator directly ("Build the following website…"). Include: project overview, business context, ideal customer and psychology, offer, brand positioning and identity, website objective, conversion strategy and CRO requirements, exact page architecture, complete copy for every section, CTA copy and behaviour, social-proof structure (placeholders only where proof is missing), pricing, FAQ, final CTA, UX, mobile, animation (respect prefers-reduced-motion), forms, payment integration ([INSERT PAYMENT LINK], never invent URLs), SEO, analytics readiness, technical, accessibility, performance, final QA checklist. Plain text, no commentary.\n${RULES}\nContext: ${ctx(5)}`,{modelTier:'complex',cache:false}));S.lock.final=1})}
+async function site(){S.step=6;await run(['Preparing…','Mapping customer psychology…','Generating copy and layout…','Creating responsive components…','Optimizing mobile experience…','Processing final checks…'],async()=>{S.site=clean(await ai(`Build the complete website from this master prompt as ONE self-contained HTML file (inline CSS+JS, responsive, mobile-first, working CTAs, payment buttons link to #payment placeholder with comment, no external images or scripts, no lorem ipsum). Return ONLY the HTML document.\n\n${S.master}`,{modelTier:'complex',cache:false,onText:({text})=>{pct=Math.min(95,Math.round(text.length/250))}}))})}
+async function editAi(){const ins=$('#ed').value.trim();if(!ins)return;await run(['Reading your site…','Applying your edit…','Preserving the rest…'],async()=>{S.site=clean(await ai(`Update this website per the instruction. Keep unrelated parts unchanged. Return ONLY the full updated HTML.\nInstruction: ${ins}\nBrand/CRO context: ${ctx(5)}\nCurrent code:\n${S.site}`,{modelTier:'complex',cache:false}))})}
+async function copy(t){try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(x){}a.remove()}}
+document.addEventListener('input',e=>{const k=e.target.dataset.in;if(k){S.a[k]=e.target.value;save()}});
+document.addEventListener('click',async e=>{const b=e.target.closest('button');if(!b||busy)return;const d=b.dataset;
+if(d.go!==undefined){S.step=+d.go;editing=false;err='';save();render()}
+else if(d.k){const m=d.t=='m';if(m){const a=S.a[d.k]||[];S.a[d.k]=a.includes(d.v)?a.filter(x=>x!=d.v):[...a,d.v]}else S.a[d.k]=d.v;save();render()}
+else if(d.gen!==undefined)gen(+d.gen);
+else if(d.edit){editing=true;render()}
+else if(d.lock!==undefined){const s=ST[+d.lock];S.lock[s.id]=1;S.step=+d.lock+1;save();render();if(S.step==5&&!S.master)master()}
+else if(d.help){b.textContent='Thinking…';try{S.a[d.help]=await ai(`Suggest a short, realistic answer (max 40 words) for the founder to the question "${ST[S.step].qs.find(q=>q[0]==d.help)[1]}". Founder context so far: ${JSON.stringify(S.a)} ${ctx(S.step)}. Return only the answer text.`,{cache:false});save()}catch(x){err=x.message}render()}
+else if(d.master)master();
+else if(d.site)site();
+else if(d.copy)copy(S[d.copy]).then(()=>{b.textContent='Copied ✓'});
+else if(d.dl){if(dl)dl.save({filename:d.dl=='site'?'website.html':'website-build-prompt.txt',data:S[d.dl]}).catch(()=>{});else{err='Download is unavailable here. Use Copy instead.';render()}}
+else if(d.dev){dev=d.dev;$('#fr').style.width=dev}
+else if(d.code){const c=$('#code');c.hidden=!c.hidden;c.textContent=S.site}
+else if(d.editAi)editAi();
+else if(d.act=='reset'&&confirm('Start over? Your current project will be cleared.')){S={step:0,a:{},bp:{},lock:{},master:'',site:''};save();render()}});
+render();
+dl={save:({filename,data})=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:'text/plain'}));a.download=filename;a.click();return Promise.resolve()}};
+</script></body></html>
